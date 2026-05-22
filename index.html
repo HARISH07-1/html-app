@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Demo App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🚀 DevOps Demo Application</h1>
+
+        <p>This application is deployed using:</p>
+
+        <ul>
+            <li>Git & GitHub</li>
+            <li>Jenkins CI/CD</li>
+            <li>Docker</li>
+            <li>Nginx</li>
+        </ul>
+
+        <button onclick="showMessage()">
+            Click Me
+        </button>
+
+        <h2 id="message"></h2>
+    </div>
+
+    <script>
+        function showMessage() {
+            document.getElementById("message").innerHTML =
+                "🔥 Automation Pipeline Working Successfully!";
+        }
+    </script>
+
+</body>
+</html>
