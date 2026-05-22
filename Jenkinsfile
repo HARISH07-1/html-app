@@ -5,7 +5,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
+                bat '''
                 docker build -t html-application .
                 '''
             }
@@ -13,14 +13,11 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                sh '''
-                docker stop html-container || true
-                docker rm html-container || true
+                bat '''
+                docker stop html-container || exit 0
+                docker rm html-container || exit 0
 
-                docker run -d \
-                --name html-container \
-                -p 9876:80 \
-                html-application
+                docker run -d --name html-container -p 9876:80 html-application
                 '''
             }
         }
