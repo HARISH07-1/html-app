@@ -14,8 +14,8 @@ pipeline {
         stage('Run Docker Container') {
             steps {
                 bat '''
-                docker stop demo-html || exit 0
-                docker rm demo-html || exit 0
+                docker stop html-container || exit 0
+                docker rm html-container || exit 0
 
                 docker run -d --name html-container -p 9876:80 demo-html
                 '''
