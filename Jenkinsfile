@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        KUBECONFIG = 'C:\\Users\\HARISH\\.kube\\config'
+    }
+
     stages {
 
         stage('Build Docker Image') {
@@ -19,9 +23,23 @@ pipeline {
             }
         }
 
+        stage('Load Image to Minikube') {
+            steps {
+                bat 'minikube image load demo-html'
+            }
+        }
+
         stage('Deploy Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml'
+                bat 'kubectl apply -f deployment.yaml --validate=false'
+                bat 'kubectl apply -f service.yaml --validate=false'
+            }
+        }
+
+        stage('Check Kubernetes Pods') {
+            steps {
+                bat 'kubectl get pods'
+                bat 'kubectl get svc'
             }
         }
     }
