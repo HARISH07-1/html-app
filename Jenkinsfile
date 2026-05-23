@@ -1,50 +1,33 @@
 pipeline {
     agent any
 
-    environment {
-        KUBECONFIG = '/home/adminharish/.kube/config'
-    }
-
     stages {
-
-        stage('Check Kubernetes Cluster') {
-            steps {
-                bat '''
-                kubectl get nodes
-                '''
-            }
-        }
 
         stage('Build Docker Image') {
             steps {
+                bat 'docker build -t demo-html .'
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
                 bat '''
-                docker build -t demo-html .
+                docker rm -f html-container
+
+                docker run -d --name html-container -p 9876:80 demo-html
                 '''
             }
         }
 
-        stage('Load Image into Minikube') {
+        stage('Deploy to Kubernetes in WSL') {
             steps {
                 bat '''
-                minikube image load demo-html
-                '''
-            }
-        }
-
-        stage('Deploy Kubernetes') {
-            steps {
-                bat '''
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
-                '''
-            }
-        }
-
-        stage('Check Kubernetes Resources') {
-            steps {
-                bat '''
-                kubectl get pods
-                kubectl get svc
+                wsl bash -c "cd ~/html-app && \
+                minikube image load demo-html && \
+                kubectl apply -f deployment.yaml && \
+                kubectl apply -f service.yaml && \
+                kubectl get pods && \
+                kubectl get svc"
                 '''
             }
         }
@@ -56,7 +39,7 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed. Check logs.'
+            echo 'Pipeline failed!'
         }
     }
 }
