@@ -2,45 +2,61 @@ pipeline {
     agent any
 
     environment {
-        KUBECONFIG = 'C:\\Users\\HARISH\\.kube\\config'
+        KUBECONFIG = '/home/adminharish/.kube/config'
     }
 
     stages {
 
-        stage('Build Docker Image') {
-            steps {
-                bat 'docker build -t demo-html .'
-            }
-        }
-
-        stage('Run Docker Container') {
+        stage('Check Kubernetes Cluster') {
             steps {
                 bat '''
-                docker rm -f html-container
-
-                docker run -d --name html-container -p 9876:80 demo-html
+                kubectl get nodes
                 '''
             }
         }
 
-        stage('Load Image to Minikube') {
+        stage('Build Docker Image') {
             steps {
-                bat 'minikube image load demo-html'
+                bat '''
+                docker build -t demo-html .
+                '''
+            }
+        }
+
+        stage('Load Image into Minikube') {
+            steps {
+                bat '''
+                minikube image load demo-html
+                '''
             }
         }
 
         stage('Deploy Kubernetes') {
             steps {
-                bat 'kubectl apply -f deployment.yaml --validate=false'
-                bat 'kubectl apply -f service.yaml --validate=false'
+                bat '''
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
+                '''
             }
         }
 
-        stage('Check Kubernetes Pods') {
+        stage('Check Kubernetes Resources') {
             steps {
-                bat 'kubectl get pods'
-                bat 'kubectl get svc'
+                bat '''
+                kubectl get pods
+                kubectl get svc
+                '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Kubernetes deployment successful!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Check logs.'
         }
     }
 }
